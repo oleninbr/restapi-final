@@ -1,5 +1,13 @@
 ﻿using System.Reflection;
+using Domain.Conditioner;
+using Domain.ConditionerStatus;
+using Domain.ConditionerType;
 using Domain.Entities;
+using Domain.MaintenanceSchedules;
+using Domain.Manufacturer;
+using Domain.WorkOrder;
+using Domain.WorkOrderPriorities;
+using Domain.WorkOrderStatuses;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence;

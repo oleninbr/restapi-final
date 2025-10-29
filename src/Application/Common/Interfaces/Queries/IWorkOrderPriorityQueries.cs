@@ -1,4 +1,4 @@
-﻿using Domain.Entities;
+﻿using Domain.WorkOrderPriorities;
 
 namespace Application.Common.Interfaces.Queries
 {

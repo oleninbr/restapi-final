@@ -1,4 +1,4 @@
-﻿using Domain.Entities;
+﻿using Domain.ConditionerType;
 using System;
 
 namespace WebAPI.Dtos;

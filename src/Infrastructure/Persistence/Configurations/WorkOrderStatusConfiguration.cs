@@ -1,7 +1,7 @@
-﻿using Domain.Entities;
-using Infrastructure.Persistence.Converters;
+﻿using Infrastructure.Persistence.Converters;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
+using Domain.WorkOrderStatuses;
 
 public class WorkOrderStatusConfiguration : IEntityTypeConfiguration<WorkOrderStatus>
 {

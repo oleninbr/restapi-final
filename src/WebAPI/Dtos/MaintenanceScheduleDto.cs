@@ -1,4 +1,4 @@
-﻿using Domain.Entities;
+﻿using Domain.MaintenanceSchedules;
 using System;
 
 namespace WebAPI.Dtos;

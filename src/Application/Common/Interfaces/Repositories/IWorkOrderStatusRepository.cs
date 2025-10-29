@@ -1,4 +1,4 @@
-﻿using Domain.Entities;
+﻿using Domain.WorkOrderStatuses;
 
 namespace Application.Common.Interfaces.Repositories
 {

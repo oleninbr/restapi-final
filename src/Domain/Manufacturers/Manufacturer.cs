@@ -1,4 +1,4 @@
-﻿namespace Domain.Entities;
+﻿namespace Domain.Manufacturer;
 
 public class Manufacturer
 {

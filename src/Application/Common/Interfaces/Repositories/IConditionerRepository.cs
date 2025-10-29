@@ -1,4 +1,4 @@
-﻿using Domain.Entities;
+﻿using Domain.Conditioner;
 
 namespace Application.Common.Interfaces.Repositories
 {

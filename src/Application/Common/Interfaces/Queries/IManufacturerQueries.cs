@@ -1,4 +1,4 @@
-﻿using Domain.Entities;
+﻿using Domain.Manufacturer;
 
 namespace Application.Common.Interfaces.Queries
 {

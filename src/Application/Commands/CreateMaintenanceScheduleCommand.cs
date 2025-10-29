@@ -1,5 +1,5 @@
 ﻿using Application.Common.Interfaces.Repositories;
-using Domain.Entities;
+using Domain.MaintenanceSchedules;
 using MediatR;
 
 namespace Application.Commands;

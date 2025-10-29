@@ -1,4 +1,4 @@
-﻿using Domain.Entities;
+﻿using Domain.ConditionerStatus;
 using Infrastructure.Persistence.Converters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;

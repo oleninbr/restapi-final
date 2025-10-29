@@ -1,4 +1,4 @@
-﻿using Domain.Entities;
+﻿using Domain.MaintenanceSchedules;
 
 namespace Application.Common.Interfaces.Queries
 {

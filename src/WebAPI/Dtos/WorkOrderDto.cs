@@ -1,4 +1,4 @@
-﻿using Domain.Entities;
+﻿using Domain.WorkOrder;
 using System;
 
 namespace WebAPI.Dtos;

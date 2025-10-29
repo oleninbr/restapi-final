@@ -1,4 +1,4 @@
-﻿using Domain.Entities;
+﻿using Domain.WorkOrderStatuses;
 using System;
 
 namespace WebAPI.Dtos;

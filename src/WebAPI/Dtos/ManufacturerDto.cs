@@ -1,4 +1,4 @@
-﻿using Domain.Entities;
+﻿using Domain.Manufacturer;
 using System;
 
 namespace WebAPI.Dtos;

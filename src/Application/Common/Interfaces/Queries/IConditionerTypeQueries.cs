@@ -1,4 +1,4 @@
-﻿using Domain.Entities;
+﻿using Domain.ConditionerType;
 
 namespace Application.Common.Interfaces.Queries
 {

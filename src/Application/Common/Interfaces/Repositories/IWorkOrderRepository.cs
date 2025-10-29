@@ -1,4 +1,4 @@
-﻿using Domain.Entities;
+﻿using Domain.WorkOrder;
 
 namespace Application.Common.Interfaces.Repositories
 {
