@@ -97,9 +97,9 @@ public class UpdateConditionerCommandHandler(
     }
 
     private async Task<Either<ConditionerException, Conditioner>> UpdateEntity(
-       UpdateConditionerCommand request,
-       Conditioner conditioner,
-       CancellationToken cancellationToken)
+    UpdateConditionerCommand request,
+    Conditioner conditioner,
+    CancellationToken cancellationToken)
     {
         try
         {
@@ -109,9 +109,9 @@ public class UpdateConditionerCommandHandler(
                 request.SerialNumber,
                 request.Location,
                 request.InstallationDate,
-                request.StatusId, // Pass Guid directly  
-                request.TypeId,   // Pass Guid directly  
-                request.ManufacturerId); // Pass Guid directly  
+                new ConditionerStatusId(request.StatusId),
+                new ConditionerTypeId(request.TypeId),
+                new ManufacturerId(request.ManufacturerId)); 
 
             return await conditionerRepository.UpdateAsync(conditioner, cancellationToken);
         }
@@ -120,4 +120,5 @@ public class UpdateConditionerCommandHandler(
             return new UnhandledConditionerException(conditioner.Id, exception);
         }
     }
+
 }

@@ -12,11 +12,15 @@ public class Conditioner
     public string SerialNumber { get; private set; }
     public string Location { get; private set; }
     public DateTime InstallationDate { get; private set; }
-    public Guid StatusId { get; private set; }
-    public Guid TypeId { get; private set; }
-    public Guid ManufacturerId { get; private set; }
+
+    // ✅ Тепер це value objects, а не Guid
+    public ConditionerStatusId StatusId { get; private set; }
+    public ConditionerTypeId TypeId { get; private set; }
+    public ManufacturerId ManufacturerId { get; private set; }
+
     public DateTime CreatedAt { get; }
     public DateTime? UpdatedAt { get; private set; }
+
     // 🔹 Навігаційні властивості
     public ConditionerStatus? Status { get; private set; }
     public ConditionerType? Type { get; private set; }
@@ -29,9 +33,9 @@ public class Conditioner
         string serialNumber,
         string location,
         DateTime installationDate,
-        Guid statusId,
-        Guid typeId,
-        Guid manufacturerId,
+        ConditionerStatusId statusId,
+        ConditionerTypeId typeId,
+        ManufacturerId manufacturerId,
         DateTime createdAt,
         DateTime? updatedAt)
     {
@@ -55,9 +59,9 @@ public class Conditioner
         string serialNumber,
         string location,
         DateTime installationDate,
-        Guid statusId,
-        Guid typeId,
-        Guid manufacturerId)
+        ConditionerStatusId statusId,
+        ConditionerTypeId typeId,
+        ManufacturerId manufacturerId)
     {
         return new Conditioner(
             id, name, model, serialNumber, location,
@@ -71,9 +75,9 @@ public class Conditioner
         string serialNumber,
         string location,
         DateTime installationDate,
-        Guid statusId,
-        Guid typeId,
-        Guid manufacturerId)
+        ConditionerStatusId statusId,
+        ConditionerTypeId typeId,
+        ManufacturerId manufacturerId)
     {
         Name = name;
         Model = model;

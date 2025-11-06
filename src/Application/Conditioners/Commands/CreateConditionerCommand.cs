@@ -61,31 +61,31 @@ public class CreateConditionerCommandHandler(
     }
 
     private async Task<Either<ConditionerException, Conditioner>> CreateEntity(
-       CreateConditionerCommand request,
-       CancellationToken cancellationToken)
+        CreateConditionerCommand request,
+        CancellationToken cancellationToken)
     {
         try
         {
-            var conditioner = await conditionerRepository.AddAsync(
-                Conditioner.New(
-                    ConditionerId.New(),
-                    request.Name,
-                    request.Model,
-                    request.SerialNumber,
-                    request.Location,
-                    request.InstallationDate,
-                    request.StatusId, // Changed from 'new ConditionerStatusId(request.StatusId)' to 'request.StatusId'  
-                    request.TypeId,
-                    request.ManufacturerId),
-                cancellationToken);
+            var conditioner = Conditioner.New(
+                ConditionerId.New(),
+                request.Name,
+                request.Model,
+                request.SerialNumber,
+                request.Location,
+                request.InstallationDate,
+                new ConditionerStatusId(request.StatusId), //value objects
+                new ConditionerTypeId(request.TypeId),       
+                new ManufacturerId(request.ManufacturerId)); 
 
-            return conditioner;
+            var result = await conditionerRepository.AddAsync(conditioner, cancellationToken);
+            return result;
         }
         catch (Exception exception)
         {
             return new UnhandledConditionerException(ConditionerId.Empty(), exception);
         }
     }
+
 
     private async Task<Either<ConditionerException, Conditioner>> SendNotification(
         Conditioner conditioner,

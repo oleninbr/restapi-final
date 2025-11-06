@@ -1,5 +1,7 @@
-﻿using Application.Common.Interfaces.Queries;
+﻿using Application.Common.Interfaces;
+using Application.Common.Interfaces.Queries;
 using Application.Common.Interfaces.Repositories;
+using Infrastructure.Emails;
 using Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -25,6 +27,11 @@ public static class ConfigurePersistenceServicesExtensions
                 builder => builder.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName))
             //.UseSnakeCaseNamingConvention()
             .ConfigureWarnings(w => w.Ignore(CoreEventId.ManyServiceProvidersCreatedWarning)));
+
+        //added for interface mapping
+        services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
+        //added email service
+        services.AddScoped<IEmailSendingService, EmailSendingService>();
 
         services.AddScoped<ApplicationDbContextInitialiser>();
         services.AddRepositories();

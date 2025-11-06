@@ -23,9 +23,9 @@ public record ConditionerDto(
             conditioner.SerialNumber,
             conditioner.Location,
             conditioner.InstallationDate,
-            conditioner.StatusId,
-            conditioner.TypeId,
-            conditioner.ManufacturerId,
+            conditioner.StatusId.Value,
+            conditioner.TypeId.Value,
+            conditioner.ManufacturerId.Value,
             conditioner.CreatedAt,
             conditioner.UpdatedAt);
 }
