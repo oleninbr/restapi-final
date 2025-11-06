@@ -13,7 +13,6 @@ public class Conditioner
     public string Location { get; private set; }
     public DateTime InstallationDate { get; private set; }
 
-    // ✅ Тепер це value objects, а не Guid
     public ConditionerStatusId StatusId { get; private set; }
     public ConditionerTypeId TypeId { get; private set; }
     public ManufacturerId ManufacturerId { get; private set; }
@@ -21,11 +20,13 @@ public class Conditioner
     public DateTime CreatedAt { get; }
     public DateTime? UpdatedAt { get; private set; }
 
-    // 🔹 Навігаційні властивості
+    // Навігаційні властивості
     public ConditionerStatus? Status { get; private set; }
     public ConditionerType? Type { get; private set; }
     public Manufacturer? Manufacturer { get; private set; }
 
+    // added many-to-many relationship
+    public ICollection<ConditionerMaintenanceSchedule>? MaintenanceSchedules { get; private set; } = [];
     private Conditioner(
         ConditionerId id,
         string name,

@@ -73,5 +73,10 @@ public static class ConfigurePersistenceServicesExtensions
         services.AddScoped<WorkOrderStatusRepository>();
         services.AddScoped<IWorkOrderStatusRepository>(provider => provider.GetRequiredService<WorkOrderStatusRepository>());
         services.AddScoped<IWorkOrderStatusQueries>(provider => provider.GetRequiredService<WorkOrderStatusRepository>());
+
+        services.AddScoped<ConditionerMaintenanceScheduleRepository>();
+        services.AddScoped<IConditionerMaintenanceScheduleRepository>(provider =>
+            provider.GetRequiredService<ConditionerMaintenanceScheduleRepository>());
+
     }
 }

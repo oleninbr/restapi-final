@@ -21,6 +21,8 @@ public class MaintenanceSchedule
     public DateTime CreatedAt { get; }
     public DateTime? UpdatedAt { get; private set; }
 
+    // added many-to-many relationship
+    public ICollection<ConditionerMaintenanceSchedule>? Conditioners { get; private set; } = [];
     private MaintenanceSchedule(
         MaintenanceScheduleId id,
         ConditionerId conditionerId,

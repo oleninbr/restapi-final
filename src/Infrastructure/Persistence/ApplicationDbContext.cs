@@ -31,6 +31,8 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<WorkOrderPriority> WorkOrderPriorities { get; init; }
     public DbSet<WorkOrderStatus> WorkOrderStatuses { get; init; }
 
+    // Configure M:N relationship between Conditioner and MaintenanceSchedule
+    public DbSet<ConditionerMaintenanceSchedule> ConditionerMaintenanceSchedules { get; init; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
