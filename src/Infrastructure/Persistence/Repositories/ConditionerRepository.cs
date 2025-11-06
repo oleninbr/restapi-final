@@ -1,7 +1,8 @@
 ﻿using Application.Common.Interfaces.Queries;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Settings;
-using Domain.Conditioner;
+using Domain.Conditioners;
+using LanguageExt;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence.Repositories;
@@ -12,10 +13,14 @@ public class ConditionerRepository : IConditionerRepository, IConditionerQueries
 
     public ConditionerRepository(ApplicationDbContext context, ApplicationSettings settings)
     {
-        var connectionString = settings.ConnectionStrings.DefaultConnection; // приклад використання
-
+        // приклад використання конфігурації
+        var connectionString = settings.ConnectionStrings.DefaultConnection;
         _context = context;
     }
+
+    // -----------------------------
+    // 🔹 CRUD METHODS (Repository)
+    // -----------------------------
 
     public async Task<Conditioner> AddAsync(Conditioner entity, CancellationToken cancellationToken)
     {
@@ -24,29 +29,50 @@ public class ConditionerRepository : IConditionerRepository, IConditionerQueries
         return entity;
     }
 
-    public async Task<IReadOnlyList<Conditioner>> GetAllAsync(CancellationToken cancellationToken)
-    {
-        return await _context.Conditioners.ToListAsync(cancellationToken);
-    }
-
-    public async Task<Conditioner> GetByIdAsync(Guid id, CancellationToken cancellationToken)
-    {
-        return await _context.Conditioners.FindAsync(new object[] { id }, cancellationToken);
-    }
-
-    public async Task UpdateAsync(Conditioner entity, CancellationToken cancellationToken)
+    public async Task<Conditioner> UpdateAsync(Conditioner entity, CancellationToken cancellationToken)
     {
         _context.Conditioners.Update(entity);
         await _context.SaveChangesAsync(cancellationToken);
+        return entity;
     }
 
-    public async Task DeleteAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<Conditioner> DeleteAsync(Conditioner entity, CancellationToken cancellationToken)
     {
-        var entity = await _context.Conditioners.FindAsync(new object[] { id }, cancellationToken);
-        if (entity != null)
-        {
-            _context.Conditioners.Remove(entity);
-            await _context.SaveChangesAsync(cancellationToken);
-        }
+        _context.Conditioners.Remove(entity);
+        await _context.SaveChangesAsync(cancellationToken);
+        return entity;
+    }
+
+    // -----------------------------
+    // 🔹 QUERIES (IConditionerQueries)
+    // -----------------------------
+
+    public async Task<Option<Conditioner>> GetByIdAsync(ConditionerId id, CancellationToken cancellationToken)
+    {
+        var entity = await _context.Conditioners
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Id.Equals(id), cancellationToken);
+
+        return entity ?? Option<Conditioner>.None;
+    }
+
+    public async Task<Option<Conditioner>> GetBySerialNumberAsync(string serialNumber, CancellationToken cancellationToken)
+    {
+        var entity = await _context.Conditioners
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.SerialNumber == serialNumber, cancellationToken);
+
+        return entity ?? Option<Conditioner>.None;
+    }
+
+    public async Task<IReadOnlyList<Conditioner>> GetAllAsync(CancellationToken cancellationToken)
+    {
+        // включаємо зв’язані сутності
+        return await _context.Conditioners
+            .Include(x => x.Status!)
+            .Include(x => x.Type!)
+            .Include(x => x.Manufacturer!)
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
     }
 }

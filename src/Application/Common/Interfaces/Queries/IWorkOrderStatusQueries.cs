@@ -1,10 +1,10 @@
 ﻿using Domain.WorkOrderStatuses;
+using LanguageExt;
 
-namespace Application.Common.Interfaces.Queries
+namespace Application.Common.Interfaces.Queries;
+
+public interface IWorkOrderStatusQueries
 {
-    public interface IWorkOrderStatusQueries
-    {
-        Task<IReadOnlyList<WorkOrderStatus>> GetAllAsync(CancellationToken cancellationToken);
-        Task<WorkOrderStatus> GetByIdAsync(Guid id, CancellationToken cancellationToken);
-    }
+    Task<IReadOnlyList<WorkOrderStatus>> GetAllAsync(CancellationToken cancellationToken);
+    Task<Option<WorkOrderStatus>> GetByIdAsync(WorkOrderStatusId id, CancellationToken cancellationToken);
 }

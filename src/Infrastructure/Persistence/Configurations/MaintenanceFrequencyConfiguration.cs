@@ -1,4 +1,5 @@
-﻿using Domain.Entities;
+﻿using Domain.Conditioners;
+using Domain.MaintenanceFrequencies;
 using Infrastructure.Persistence.Converters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -10,6 +11,7 @@ public class MaintenanceFrequencyConfiguration : IEntityTypeConfiguration<Mainte
     public void Configure(EntityTypeBuilder<MaintenanceFrequency> builder)
     {
         builder.HasKey(x => x.Id);
+        builder.Property(x => x.Id).HasConversion(x => x.Value, x => new MaintenanceFrequencyId(x));
 
         builder.Property(x => x.Name)
             .HasMaxLength(255)

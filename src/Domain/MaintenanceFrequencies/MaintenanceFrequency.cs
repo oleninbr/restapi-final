@@ -1,13 +1,13 @@
-﻿namespace Domain.Entities;
+﻿namespace Domain.MaintenanceFrequencies;
 
 public class MaintenanceFrequency
 {
-    public Guid Id { get; }
+    public MaintenanceFrequencyId Id { get; }
     public string Name { get; private set; }
     public DateTime CreatedAt { get; }
     public DateTime? UpdatedAt { get; private set; }
 
-    private MaintenanceFrequency(Guid id, string name, DateTime createdAt, DateTime? updatedAt)
+    private MaintenanceFrequency(MaintenanceFrequencyId id, string name, DateTime createdAt, DateTime? updatedAt)
     {
         Id = id;
         Name = name;
@@ -15,10 +15,8 @@ public class MaintenanceFrequency
         UpdatedAt = updatedAt;
     }
 
-    public static MaintenanceFrequency New(Guid id, string name)
-    {
-        return new MaintenanceFrequency(id, name, DateTime.UtcNow, null);
-    }
+    public static MaintenanceFrequency New(MaintenanceFrequencyId id, string name)
+        => new(id, name, DateTime.UtcNow, null);
 
     public void UpdateName(string name)
     {

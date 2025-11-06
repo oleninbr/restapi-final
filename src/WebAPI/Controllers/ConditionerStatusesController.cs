@@ -1,40 +1,52 @@
 ﻿using WebAPI.Dtos;
+using WebAPI.Modules.Errors;
+using Application.ConditionerStatuses.Commands;
 using Application.Common.Interfaces.Queries;
-using Application.Commands;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace WebAPI.Controllers;
 
-[Route("conditioner-statuses")]
 [ApiController]
+[Route("conditioner-statuses")]
 public class ConditionerStatusesController(
-    IConditionerStatusQueries conditionerStatusQueries,
+    IConditionerStatusQueries queries,
     ISender sender) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyList<ConditionerStatusDto>>> GetConditionerStatuses(CancellationToken cancellationToken)
+    public async Task<ActionResult<IReadOnlyList<ConditionerStatusDto>>> GetAll(CancellationToken cancellationToken)
     {
-        var statuses = await conditionerStatusQueries.GetAllAsync(cancellationToken);
-        return statuses.Select(ConditionerStatusDto.FromDomainModel).ToList();
+        var entities = await queries.GetAllAsync(cancellationToken);
+        return entities.Select(ConditionerStatusDto.FromDomainModel).ToList();
     }
 
     [HttpPost]
-    public async Task<ActionResult<ConditionerStatusDto>> CreateConditionerStatus(
-        [FromBody] CreateConditionerStatusDto request,
-        CancellationToken cancellationToken)
+    public async Task<ActionResult<ConditionerStatusDto>> Create([FromBody] CreateConditionerStatusDto request, CancellationToken cancellationToken)
     {
-        var command = new CreateConditionerStatusCommand
-        {
-            Name = request.Name
-        };
+        var input = new CreateConditionerStatusCommand { Name = request.Name };
+        var result = await sender.Send(input, cancellationToken);
+        return result.Match<ActionResult<ConditionerStatusDto>>(
+            s => ConditionerStatusDto.FromDomainModel(s),
+            e => e.ToObjectResult());
+    }
 
-        var newStatus = await sender.Send(command, cancellationToken);
+    [HttpPut]
+    public async Task<ActionResult<ConditionerStatusDto>> Update([FromBody] UpdateConditionerStatusDto request, CancellationToken cancellationToken)
+    {
+        var input = new UpdateConditionerStatusCommand { ConditionerStatusId = request.Id, Name = request.Name };
+        var result = await sender.Send(input, cancellationToken);
+        return result.Match<ActionResult<ConditionerStatusDto>>(
+            s => ConditionerStatusDto.FromDomainModel(s),
+            e => e.ToObjectResult());
+    }
 
-        return ConditionerStatusDto.FromDomainModel(newStatus);
+    [HttpDelete("{id:guid}")]
+    public async Task<ActionResult<ConditionerStatusDto>> Delete([FromRoute] Guid id, CancellationToken cancellationToken)
+    {
+        var input = new DeleteConditionerStatusCommand { ConditionerStatusId = id };
+        var result = await sender.Send(input, cancellationToken);
+        return result.Match<ActionResult<ConditionerStatusDto>>(
+            s => ConditionerStatusDto.FromDomainModel(s),
+            e => e.ToObjectResult());
     }
 }

@@ -1,31 +1,43 @@
-﻿namespace Domain.WorkOrder;
+﻿using Domain.Conditioners;
+using Domain.WorkOrderStatuses;
+using Domain.WorkOrderPriorities;
 
+namespace Domain.WorkOrders;
 public class WorkOrder
 {
-    public Guid Id { get; }
+    public WorkOrderId Id { get; }
     public string WorkOrderNumber { get; private set; }
-    public Guid ConditionerId { get; private set; }
+
+    public ConditionerId ConditionerId { get; private set; }
+    public Conditioner? Conditioner { get; private set; }
+
     public string Title { get; private set; }
     public string Description { get; private set; }
-    public Guid PriorityId { get; private set; }
-    public Guid StatusId { get; private set; }
+
+    public WorkOrderPriorityId PriorityId { get; private set; }
+    public WorkOrderPriority? Priority { get; private set; }
+
+    public WorkOrderStatusId StatusId { get; private set; }
+    public WorkOrderStatus? Status { get; private set; }
+
     public DateTime ScheduledDate { get; private set; }
     public DateTime? CompletedAt { get; private set; }
-    public string CompletionNotes { get; private set; }
+    public string? CompletionNotes { get; private set; }
+
     public DateTime CreatedAt { get; }
     public DateTime? UpdatedAt { get; private set; }
 
     private WorkOrder(
-        Guid id,
+        WorkOrderId id,
         string workOrderNumber,
-        Guid conditionerId,
+        ConditionerId conditionerId,
         string title,
         string description,
-        Guid priorityId,
-        Guid statusId,
+        WorkOrderPriorityId priorityId,
+        WorkOrderStatusId statusId,
         DateTime scheduledDate,
         DateTime? completedAt,
-        string completionNotes,
+        string? completionNotes,
         DateTime createdAt,
         DateTime? updatedAt)
     {
@@ -44,38 +56,17 @@ public class WorkOrder
     }
 
     public static WorkOrder New(
-        Guid id,
+        WorkOrderId id,
         string workOrderNumber,
-        Guid conditionerId,
+        ConditionerId conditionerId,
         string title,
         string description,
-        Guid priorityId,
-        Guid statusId,
+        WorkOrderPriorityId priorityId,
+        WorkOrderStatusId statusId,
         DateTime scheduledDate)
-    {
-        return new WorkOrder(
-            id,
-            workOrderNumber,
-            conditionerId,
-            title,
-            description,
-            priorityId,
-            statusId,
-            scheduledDate,
-            null,
-            null,
-            DateTime.UtcNow,
-            null);
-    }
+        => new(id, workOrderNumber, conditionerId, title, description, priorityId, statusId, scheduledDate, null, null, DateTime.UtcNow, null);
 
-    public void UpdateDetails(
-        string title,
-        string description,
-        Guid priorityId,
-        Guid statusId,
-        DateTime scheduledDate,
-        DateTime? completedAt,
-        string completionNotes)
+    public void UpdateDetails(string title, string description, WorkOrderPriorityId priorityId, WorkOrderStatusId statusId, DateTime scheduledDate, DateTime? completedAt, string? completionNotes)
     {
         Title = title;
         Description = description;

@@ -1,4 +1,4 @@
-﻿using Domain.Manufacturer;
+﻿using Domain.Manufacturers;
 using Infrastructure.Persistence.Converters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -10,6 +10,7 @@ public class ManufacturerConfiguration : IEntityTypeConfiguration<Manufacturer>
     public void Configure(EntityTypeBuilder<Manufacturer> builder)
     {
         builder.HasKey(x => x.Id);
+        builder.Property(x => x.Id).HasConversion(x => x.Value, x => new ManufacturerId(x));
 
         builder.Property(x => x.Name)
             .HasMaxLength(255)

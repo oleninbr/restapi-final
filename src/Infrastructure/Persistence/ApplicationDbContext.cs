@@ -1,18 +1,21 @@
-﻿using System.Reflection;
-using Domain.Conditioner;
-using Domain.ConditionerStatus;
-using Domain.ConditionerType;
-using Domain.Entities;
+﻿using System.Data;
+using System.Reflection;
+using Application.Common.Interfaces;
+using Domain.Conditioners;
+using Domain.ConditionerStatuses;
+using Domain.ConditionerTypes;
+using Domain.MaintenanceFrequencies;
 using Domain.MaintenanceSchedules;
-using Domain.Manufacturer;
-using Domain.WorkOrder;
+using Domain.Manufacturers;
+using Domain.WorkOrders;
 using Domain.WorkOrderPriorities;
 using Domain.WorkOrderStatuses;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Infrastructure.Persistence;
 
-public class ApplicationDbContext : DbContext
+public class ApplicationDbContext : DbContext, IApplicationDbContext
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {
@@ -31,7 +34,12 @@ public class ApplicationDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-
         base.OnModelCreating(modelBuilder);
+    }
+
+    public async Task<IDbTransaction> BeginTransactionAsync(CancellationToken cancellationToken)
+    {
+        var transaction = await Database.BeginTransactionAsync(cancellationToken);
+        return transaction.GetDbTransaction();
     }
 }

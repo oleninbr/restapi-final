@@ -1,40 +1,52 @@
 ﻿using WebAPI.Dtos;
+using WebAPI.Modules.Errors;
+using Application.MaintenanceFrequencies.Commands;
 using Application.Common.Interfaces.Queries;
-using Application.Commands;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace WebAPI.Controllers;
 
-[Route("maintenance-frequencies")]
 [ApiController]
+[Route("maintenance-frequencies")]
 public class MaintenanceFrequenciesController(
-    IMaintenanceFrequencyQueries maintenanceFrequencyQueries,
+    IMaintenanceFrequencyQueries queries,
     ISender sender) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyList<MaintenanceFrequencyDto>>> GetMaintenanceFrequencies(CancellationToken cancellationToken)
+    public async Task<ActionResult<IReadOnlyList<MaintenanceFrequencyDto>>> GetAll(CancellationToken cancellationToken)
     {
-        var frequencies = await maintenanceFrequencyQueries.GetAllAsync(cancellationToken);
-        return frequencies.Select(MaintenanceFrequencyDto.FromDomainModel).ToList();
+        var entities = await queries.GetAllAsync(cancellationToken);
+        return entities.Select(MaintenanceFrequencyDto.FromDomainModel).ToList();
     }
 
     [HttpPost]
-    public async Task<ActionResult<MaintenanceFrequencyDto>> CreateMaintenanceFrequency(
-        [FromBody] CreateMaintenanceFrequencyDto request,
-        CancellationToken cancellationToken)
+    public async Task<ActionResult<MaintenanceFrequencyDto>> Create([FromBody] CreateMaintenanceFrequencyDto request, CancellationToken cancellationToken)
     {
-        var command = new CreateMaintenanceFrequencyCommand
-        {
-            Name = request.Name
-        };
+        var input = new CreateMaintenanceFrequencyCommand { Name = request.Name };
+        var result = await sender.Send(input, cancellationToken);
+        return result.Match<ActionResult<MaintenanceFrequencyDto>>(
+            f => MaintenanceFrequencyDto.FromDomainModel(f),
+            e => e.ToObjectResult());
+    }
 
-        var newFrequency = await sender.Send(command, cancellationToken);
+    [HttpPut]
+    public async Task<ActionResult<MaintenanceFrequencyDto>> Update([FromBody] UpdateMaintenanceFrequencyDto request, CancellationToken cancellationToken)
+    {
+        var input = new UpdateMaintenanceFrequencyCommand { MaintenanceFrequencyId = request.Id, Name = request.Name };
+        var result = await sender.Send(input, cancellationToken);
+        return result.Match<ActionResult<MaintenanceFrequencyDto>>(
+            f => MaintenanceFrequencyDto.FromDomainModel(f),
+            e => e.ToObjectResult());
+    }
 
-        return MaintenanceFrequencyDto.FromDomainModel(newFrequency);
+    [HttpDelete("{id:guid}")]
+    public async Task<ActionResult<MaintenanceFrequencyDto>> Delete([FromRoute] Guid id, CancellationToken cancellationToken)
+    {
+        var input = new DeleteMaintenanceFrequencyCommand { MaintenanceFrequencyId = id };
+        var result = await sender.Send(input, cancellationToken);
+        return result.Match<ActionResult<MaintenanceFrequencyDto>>(
+            f => MaintenanceFrequencyDto.FromDomainModel(f),
+            e => e.ToObjectResult());
     }
 }

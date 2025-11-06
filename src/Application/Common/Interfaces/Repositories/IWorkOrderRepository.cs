@@ -1,13 +1,15 @@
-﻿using Domain.WorkOrder;
+﻿using Domain.WorkOrders;
+using LanguageExt;
 
-namespace Application.Common.Interfaces.Repositories
+namespace Application.Common.Interfaces.Repositories;
+
+public interface IWorkOrderRepository
 {
-    public interface IWorkOrderRepository
-    {
-        Task<WorkOrder> AddAsync(WorkOrder entity, CancellationToken cancellationToken);
-        Task<WorkOrder> GetByIdAsync(Guid id, CancellationToken cancellationToken);
-        Task<IReadOnlyList<WorkOrder>> GetAllAsync(CancellationToken cancellationToken);
-        Task UpdateAsync(WorkOrder entity, CancellationToken cancellationToken);
-        Task DeleteAsync(Guid id, CancellationToken cancellationToken);
-    }
+    Task<WorkOrder> AddAsync(WorkOrder entity, CancellationToken cancellationToken);
+    Task<WorkOrder> UpdateAsync(WorkOrder entity, CancellationToken cancellationToken);
+    Task<WorkOrder> DeleteAsync(WorkOrder entity, CancellationToken cancellationToken);
+
+    Task<Option<WorkOrder>> GetByIdAsync(WorkOrderId id, CancellationToken cancellationToken);
+    Task<Option<WorkOrder>> GetByNumberAsync(string workOrderNumber, CancellationToken cancellationToken);
+    Task<IReadOnlyList<WorkOrder>> GetAllAsync(CancellationToken cancellationToken);
 }

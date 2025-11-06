@@ -1,30 +1,29 @@
 ﻿using WebAPI.Dtos;
+using WebAPI.Modules.Errors;
 using Application.Common.Interfaces.Queries;
-using Application.Commands;
+using Application.Conditioners.Commands;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers;
 
-[Route("conditioners")]
 [ApiController]
+[Route("conditioners")]
 public class ConditionersController(
     IConditionerQueries conditionerQueries,
     ISender sender) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyList<ConditionerDto>>> GetConditioners(CancellationToken cancellationToken)
+    public async Task<ActionResult<IReadOnlyList<ConditionerDto>>> GetAll(CancellationToken cancellationToken)
     {
         var conditioners = await conditionerQueries.GetAllAsync(cancellationToken);
         return conditioners.Select(ConditionerDto.FromDomainModel).ToList();
     }
 
     [HttpPost]
-    public async Task<ActionResult<ConditionerDto>> CreateConditioner(
-        [FromBody] CreateConditionerDto request,
-        CancellationToken cancellationToken)
+    public async Task<ActionResult<ConditionerDto>> Create([FromBody] CreateConditionerDto request, CancellationToken cancellationToken)
     {
-        var command = new CreateConditionerCommand
+        var input = new CreateConditionerCommand
         {
             Name = request.Name,
             Model = request.Model,
@@ -36,8 +35,42 @@ public class ConditionersController(
             ManufacturerId = request.ManufacturerId
         };
 
-        var newConditioner = await sender.Send(command, cancellationToken);
+        var result = await sender.Send(input, cancellationToken);
+        return result.Match<ActionResult<ConditionerDto>>(
+            c => ConditionerDto.FromDomainModel(c),
+            e => e.ToObjectResult());
+    }
 
-        return ConditionerDto.FromDomainModel(newConditioner);
+    [HttpPut]
+    public async Task<ActionResult<ConditionerDto>> Update([FromBody] UpdateConditionerDto request, CancellationToken cancellationToken)
+    {
+        var input = new UpdateConditionerCommand
+        {
+            ConditionerId = request.Id,
+            Name = request.Name,
+            Model = request.Model,
+            SerialNumber = request.SerialNumber,
+            Location = request.Location,
+            InstallationDate = request.InstallationDate,
+            StatusId = request.StatusId,
+            TypeId = request.TypeId,
+            ManufacturerId = request.ManufacturerId
+        };
+
+        var result = await sender.Send(input, cancellationToken);
+        return result.Match<ActionResult<ConditionerDto>>(
+            c => ConditionerDto.FromDomainModel(c),
+            e => e.ToObjectResult());
+    }
+
+    [HttpDelete("{id:guid}")]
+    public async Task<ActionResult<ConditionerDto>> Delete([FromRoute] Guid id, CancellationToken cancellationToken)
+    {
+        var input = new DeleteConditionerCommand { ConditionerId = id };
+        var result = await sender.Send(input, cancellationToken);
+
+        return result.Match<ActionResult<ConditionerDto>>(
+            c => ConditionerDto.FromDomainModel(c),
+            e => e.ToObjectResult());
     }
 }

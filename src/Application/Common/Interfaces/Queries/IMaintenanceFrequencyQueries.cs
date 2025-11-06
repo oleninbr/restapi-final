@@ -1,10 +1,10 @@
-﻿using Domain.Entities;
+﻿using Domain.MaintenanceFrequencies;
+using LanguageExt;
 
-namespace Application.Common.Interfaces.Queries
+namespace Application.Common.Interfaces.Queries;
+
+public interface IMaintenanceFrequencyQueries
 {
-    public interface IMaintenanceFrequencyQueries
-    {
-        Task<IReadOnlyList<MaintenanceFrequency>> GetAllAsync(CancellationToken cancellationToken);
-        Task<MaintenanceFrequency> GetByIdAsync(Guid id, CancellationToken cancellationToken);
-    }
+    Task<IReadOnlyList<MaintenanceFrequency>> GetAllAsync(CancellationToken cancellationToken);
+    Task<Option<MaintenanceFrequency>> GetByIdAsync(MaintenanceFrequencyId id, CancellationToken cancellationToken);
 }

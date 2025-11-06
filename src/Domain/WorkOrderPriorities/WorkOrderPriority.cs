@@ -2,12 +2,12 @@
 
 public class WorkOrderPriority
 {
-    public Guid Id { get; }
+    public WorkOrderPriorityId Id { get; }
     public string Name { get; private set; }
     public DateTime CreatedAt { get; }
     public DateTime? UpdatedAt { get; private set; }
 
-    private WorkOrderPriority(Guid id, string name, DateTime createdAt, DateTime? updatedAt)
+    private WorkOrderPriority(WorkOrderPriorityId id, string name, DateTime createdAt, DateTime? updatedAt)
     {
         Id = id;
         Name = name;
@@ -15,10 +15,8 @@ public class WorkOrderPriority
         UpdatedAt = updatedAt;
     }
 
-    public static WorkOrderPriority New(Guid id, string name)
-    {
-        return new WorkOrderPriority(id, name, DateTime.UtcNow, null);
-    }
+    public static WorkOrderPriority New(WorkOrderPriorityId id, string name)
+        => new(id, name, DateTime.UtcNow, null);
 
     public void UpdateName(string name)
     {

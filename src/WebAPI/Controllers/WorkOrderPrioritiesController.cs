@@ -1,40 +1,65 @@
 ﻿using WebAPI.Dtos;
+using WebAPI.Modules.Errors;
+using Application.WorkOrderPriorities.Commands;
 using Application.Common.Interfaces.Queries;
-using Application.Commands;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace WebAPI.Controllers;
 
-[Route("work-order-priorities")]
 [ApiController]
+[Route("work-order-priorities")]
 public class WorkOrderPrioritiesController(
-    IWorkOrderPriorityQueries workOrderPriorityQueries,
+    IWorkOrderPriorityQueries queries,
     ISender sender) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyList<WorkOrderPriorityDto>>> GetWorkOrderPriorities(CancellationToken cancellationToken)
+    public async Task<ActionResult<IReadOnlyList<WorkOrderPriorityDto>>> GetAll(CancellationToken cancellationToken)
     {
-        var priorities = await workOrderPriorityQueries.GetAllAsync(cancellationToken);
-        return priorities.Select(WorkOrderPriorityDto.FromDomainModel).ToList();
+        var entities = await queries.GetAllAsync(cancellationToken);
+        return entities.Select(WorkOrderPriorityDto.FromDomainModel).ToList();
     }
 
     [HttpPost]
-    public async Task<ActionResult<WorkOrderPriorityDto>> CreateWorkOrderPriority(
+    public async Task<ActionResult<WorkOrderPriorityDto>> Create(
         [FromBody] CreateWorkOrderPriorityDto request,
         CancellationToken cancellationToken)
     {
-        var command = new CreateWorkOrderPriorityCommand
+        var input = new CreateWorkOrderPriorityCommand { Name = request.Name };
+        var result = await sender.Send(input, cancellationToken);
+        return result.Match<ActionResult<WorkOrderPriorityDto>>(
+            p => WorkOrderPriorityDto.FromDomainModel(p),
+            e => e.ToObjectResult());
+    }
+
+    [HttpPut]
+    public async Task<ActionResult<WorkOrderPriorityDto>> Update(
+        [FromBody] UpdateWorkOrderPriorityDto request,
+        CancellationToken cancellationToken)
+    {
+        var input = new UpdateWorkOrderPriorityCommand
         {
+            WorkOrderPriorityId = request.Id, 
             Name = request.Name
         };
+        var result = await sender.Send(input, cancellationToken);
+        return result.Match<ActionResult<WorkOrderPriorityDto>>(
+            p => WorkOrderPriorityDto.FromDomainModel(p),
+            e => e.ToObjectResult());
+    }
 
-        var newPriority = await sender.Send(command, cancellationToken);
-
-        return WorkOrderPriorityDto.FromDomainModel(newPriority);
+    [HttpDelete("{id:guid}")]
+    public async Task<ActionResult<WorkOrderPriorityDto>> Delete(
+        [FromRoute] Guid id,
+        CancellationToken cancellationToken)
+    {
+        var input = new DeleteWorkOrderPriorityCommand
+        {
+            WorkOrderPriorityId = id 
+        };
+        var result = await sender.Send(input, cancellationToken);
+        return result.Match<ActionResult<WorkOrderPriorityDto>>(
+            p => WorkOrderPriorityDto.FromDomainModel(p),
+            e => e.ToObjectResult());
     }
 }

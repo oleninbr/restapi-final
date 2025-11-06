@@ -2,8 +2,8 @@
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Settings;
 using Domain.WorkOrderStatuses;
+using LanguageExt;
 using Microsoft.EntityFrameworkCore;
-
 
 namespace Infrastructure.Persistence.Repositories;
 
@@ -24,29 +24,42 @@ public class WorkOrderStatusRepository : IWorkOrderStatusRepository, IWorkOrderS
         return entity;
     }
 
-    public async Task<IReadOnlyList<WorkOrderStatus>> GetAllAsync(CancellationToken cancellationToken)
+    public async Task<Option<WorkOrderStatus>> GetByNameAsync(string name, CancellationToken cancellationToken)
     {
-        return await _context.WorkOrderStatuses.ToListAsync(cancellationToken);
+        var entity = await _context.WorkOrderStatuses
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Name == name, cancellationToken);
+
+        return entity ?? Option<WorkOrderStatus>.None;
     }
 
-    public async Task<WorkOrderStatus> GetByIdAsync(Guid id, CancellationToken cancellationToken)
-    {
-        return await _context.WorkOrderStatuses.FindAsync(new object[] { id }, cancellationToken);
-    }
-
-    public async Task UpdateAsync(WorkOrderStatus entity, CancellationToken cancellationToken)
+    public async Task<WorkOrderStatus> UpdateAsync(WorkOrderStatus entity, CancellationToken cancellationToken)
     {
         _context.WorkOrderStatuses.Update(entity);
         await _context.SaveChangesAsync(cancellationToken);
+        return entity;
     }
 
-    public async Task DeleteAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<WorkOrderStatus> DeleteAsync(WorkOrderStatus entity, CancellationToken cancellationToken)
     {
-        var entity = await _context.WorkOrderStatuses.FindAsync(new object[] { id }, cancellationToken);
-        if (entity != null)
-        {
-            _context.WorkOrderStatuses.Remove(entity);
-            await _context.SaveChangesAsync(cancellationToken);
-        }
+        _context.WorkOrderStatuses.Remove(entity);
+        await _context.SaveChangesAsync(cancellationToken);
+        return entity;
+    }
+
+    public async Task<Option<WorkOrderStatus>> GetByIdAsync(WorkOrderStatusId id, CancellationToken cancellationToken)
+    {
+        var entity = await _context.WorkOrderStatuses
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Id.Equals(id), cancellationToken);
+
+        return entity ?? Option<WorkOrderStatus>.None;
+    }
+
+    public async Task<IReadOnlyList<WorkOrderStatus>> GetAllAsync(CancellationToken cancellationToken)
+    {
+        return await _context.WorkOrderStatuses
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
     }
 }

@@ -1,10 +1,11 @@
-﻿using Domain.WorkOrder;
+﻿using Domain.WorkOrders;
+using LanguageExt;
 
-namespace Application.Common.Interfaces.Queries
+namespace Application.Common.Interfaces.Queries;
+
+public interface IWorkOrderQueries
 {
-    public interface IWorkOrderQueries
-    {
-        Task<IReadOnlyList<WorkOrder>> GetAllAsync(CancellationToken cancellationToken);
-        Task<WorkOrder> GetByIdAsync(Guid id, CancellationToken cancellationToken);
-    }
+    Task<IReadOnlyList<WorkOrder>> GetAllAsync(CancellationToken cancellationToken);
+    Task<Option<WorkOrder>> GetByIdAsync(WorkOrderId id, CancellationToken cancellationToken);
+    Task<Option<WorkOrder>> GetByNumberAsync(string workOrderNumber, CancellationToken cancellationToken);
 }

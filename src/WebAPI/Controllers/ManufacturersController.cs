@@ -1,41 +1,52 @@
 ﻿using WebAPI.Dtos;
+using WebAPI.Modules.Errors;
+using Application.Manufacturers.Commands;
 using Application.Common.Interfaces.Queries;
-using Application.Commands;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace WebAPI.Controllers;
 
-[Route("manufacturers")]
 [ApiController]
+[Route("manufacturers")]
 public class ManufacturersController(
-    IManufacturerQueries manufacturerQueries,
+    IManufacturerQueries queries,
     ISender sender) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyList<ManufacturerDto>>> GetManufacturers(CancellationToken cancellationToken)
+    public async Task<ActionResult<IReadOnlyList<ManufacturerDto>>> GetAll(CancellationToken cancellationToken)
     {
-        var manufacturers = await manufacturerQueries.GetAllAsync(cancellationToken);
-        return manufacturers.Select(ManufacturerDto.FromDomainModel).ToList();
+        var entities = await queries.GetAllAsync(cancellationToken);
+        return entities.Select(ManufacturerDto.FromDomainModel).ToList();
     }
 
     [HttpPost]
-    public async Task<ActionResult<ManufacturerDto>> CreateManufacturer(
-        [FromBody] CreateManufacturerDto request,
-        CancellationToken cancellationToken)
+    public async Task<ActionResult<ManufacturerDto>> Create([FromBody] CreateManufacturerDto request, CancellationToken cancellationToken)
     {
-        var command = new CreateManufacturerCommand
-        {
-            Name = request.Name,
-            Country = request.Country
-        };
+        var input = new CreateManufacturerCommand { Name = request.Name, Country = request.Country };
+        var result = await sender.Send(input, cancellationToken);
+        return result.Match<ActionResult<ManufacturerDto>>(
+            m => ManufacturerDto.FromDomainModel(m),
+            e => e.ToObjectResult());
+    }
 
-        var newManufacturer = await sender.Send(command, cancellationToken);
+    [HttpPut]
+    public async Task<ActionResult<ManufacturerDto>> Update([FromBody] UpdateManufacturerDto request, CancellationToken cancellationToken)
+    {
+        var input = new UpdateManufacturerCommand { ManufacturerId = request.Id, Name = request.Name, Country = request.Country };
+        var result = await sender.Send(input, cancellationToken);
+        return result.Match<ActionResult<ManufacturerDto>>(
+            m => ManufacturerDto.FromDomainModel(m),
+            e => e.ToObjectResult());
+    }
 
-        return ManufacturerDto.FromDomainModel(newManufacturer);
+    [HttpDelete("{id:guid}")]
+    public async Task<ActionResult<ManufacturerDto>> Delete([FromRoute] Guid id, CancellationToken cancellationToken)
+    {
+        var input = new DeleteManufacturerCommand { ManufacturerId = id };
+        var result = await sender.Send(input, cancellationToken);
+        return result.Match<ActionResult<ManufacturerDto>>(
+            m => ManufacturerDto.FromDomainModel(m),
+            e => e.ToObjectResult());
     }
 }

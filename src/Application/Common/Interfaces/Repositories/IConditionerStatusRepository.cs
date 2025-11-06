@@ -1,13 +1,15 @@
-﻿using Domain.ConditionerStatus;
+﻿using Domain.ConditionerStatuses;
+using LanguageExt;
 
-namespace Application.Common.Interfaces.Repositories
+namespace Application.Common.Interfaces.Repositories;
+
+public interface IConditionerStatusRepository
 {
-    public interface IConditionerStatusRepository
-    {
-        Task<ConditionerStatus> AddAsync(ConditionerStatus entity, CancellationToken cancellationToken);
-        Task<ConditionerStatus> GetByIdAsync(Guid id, CancellationToken cancellationToken);
-        Task<IReadOnlyList<ConditionerStatus>> GetAllAsync(CancellationToken cancellationToken);
-        Task UpdateAsync(ConditionerStatus entity, CancellationToken cancellationToken);
-        Task DeleteAsync(Guid id, CancellationToken cancellationToken);
-    }
+    Task<ConditionerStatus> AddAsync(ConditionerStatus entity, CancellationToken cancellationToken);
+    Task<ConditionerStatus> UpdateAsync(ConditionerStatus entity, CancellationToken cancellationToken);
+    Task<ConditionerStatus> DeleteAsync(ConditionerStatus entity, CancellationToken cancellationToken);
+
+    Task<Option<ConditionerStatus>> GetByIdAsync(ConditionerStatusId id, CancellationToken cancellationToken);
+    Task<Option<ConditionerStatus>> GetByNameAsync(string name, CancellationToken cancellationToken);
+    Task<IReadOnlyList<ConditionerStatus>> GetAllAsync(CancellationToken cancellationToken);
 }

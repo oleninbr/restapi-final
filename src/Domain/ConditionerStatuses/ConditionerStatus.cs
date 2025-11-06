@@ -1,13 +1,13 @@
-﻿namespace Domain.ConditionerStatus;
+﻿namespace Domain.ConditionerStatuses;
 
 public class ConditionerStatus
 {
-    public Guid Id { get; }
+    public ConditionerStatusId Id { get; }
     public string Name { get; private set; }
     public DateTime CreatedAt { get; }
     public DateTime? UpdatedAt { get; private set; }
 
-    private ConditionerStatus(Guid id, string name, DateTime createdAt, DateTime? updatedAt)
+    private ConditionerStatus(ConditionerStatusId id, string name, DateTime createdAt, DateTime? updatedAt)
     {
         Id = id;
         Name = name;
@@ -15,10 +15,8 @@ public class ConditionerStatus
         UpdatedAt = updatedAt;
     }
 
-    public static ConditionerStatus New(Guid id, string name)
-    {
-        return new ConditionerStatus(id, name, DateTime.UtcNow, null);
-    }
+    public static ConditionerStatus New(ConditionerStatusId id, string name)
+        => new(id, name, DateTime.UtcNow, null);
 
     public void UpdateName(string name)
     {

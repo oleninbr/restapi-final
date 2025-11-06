@@ -1,40 +1,53 @@
 ﻿using WebAPI.Dtos;
+using WebAPI.Modules.Errors;
+using Application.WorkOrderStatuses.Commands;
 using Application.Common.Interfaces.Queries;
-using Application.Commands;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+
 
 namespace WebAPI.Controllers;
 
-[Route("work-order-statuses")]
 [ApiController]
+[Route("work-order-statuses")]
 public class WorkOrderStatusesController(
-    IWorkOrderStatusQueries workOrderStatusQueries,
+    IWorkOrderStatusQueries queries,
     ISender sender) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyList<WorkOrderStatusDto>>> GetWorkOrderStatuses(CancellationToken cancellationToken)
+    public async Task<ActionResult<IReadOnlyList<WorkOrderStatusDto>>> GetAll(CancellationToken cancellationToken)
     {
-        var statuses = await workOrderStatusQueries.GetAllAsync(cancellationToken);
-        return statuses.Select(WorkOrderStatusDto.FromDomainModel).ToList();
+        var entities = await queries.GetAllAsync(cancellationToken);
+        return entities.Select(WorkOrderStatusDto.FromDomainModel).ToList();
     }
 
     [HttpPost]
-    public async Task<ActionResult<WorkOrderStatusDto>> CreateWorkOrderStatus(
-        [FromBody] CreateWorkOrderStatusDto request,
-        CancellationToken cancellationToken)
+    public async Task<ActionResult<WorkOrderStatusDto>> Create([FromBody] CreateWorkOrderStatusDto request, CancellationToken cancellationToken)
     {
-        var command = new CreateWorkOrderStatusCommand
-        {
-            Name = request.Name
-        };
+        var input = new CreateWorkOrderStatusCommand { Name = request.Name };
+        var result = await sender.Send(input, cancellationToken);
+        return result.Match<ActionResult<WorkOrderStatusDto>>(
+            s => WorkOrderStatusDto.FromDomainModel(s),
+            e => e.ToObjectResult());
+    }
 
-        var newStatus = await sender.Send(command, cancellationToken);
+    [HttpPut]
+    public async Task<ActionResult<WorkOrderStatusDto>> Update([FromBody] UpdateWorkOrderStatusDto request, CancellationToken cancellationToken)
+    {
+        var input = new UpdateWorkOrderStatusCommand { WorkOrderStatusId = request.Id, Name = request.Name };
+        var result = await sender.Send(input, cancellationToken);
+        return result.Match<ActionResult<WorkOrderStatusDto>>(
+            s => WorkOrderStatusDto.FromDomainModel(s),
+            e => e.ToObjectResult());
+    }
 
-        return WorkOrderStatusDto.FromDomainModel(newStatus);
+    [HttpDelete("{id:guid}")]
+    public async Task<ActionResult<WorkOrderStatusDto>> Delete([FromRoute] Guid id, CancellationToken cancellationToken)
+    {
+        var input = new DeleteWorkOrderStatusCommand { WorkOrderStatusId = id };
+        var result = await sender.Send(input, cancellationToken);
+        return result.Match<ActionResult<WorkOrderStatusDto>>(
+            s => WorkOrderStatusDto.FromDomainModel(s),
+            e => e.ToObjectResult());
     }
 }

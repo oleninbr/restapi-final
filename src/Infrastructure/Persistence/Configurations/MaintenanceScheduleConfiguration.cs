@@ -1,4 +1,5 @@
-﻿using Domain.MaintenanceSchedules;
+﻿using Domain.Conditioners;
+using Domain.MaintenanceSchedules;
 using Infrastructure.Persistence.Converters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -10,6 +11,7 @@ public class MaintenanceScheduleConfiguration : IEntityTypeConfiguration<Mainten
     public void Configure(EntityTypeBuilder<MaintenanceSchedule> builder)
     {
         builder.HasKey(x => x.Id);
+        builder.Property(x => x.Id).HasConversion(x => x.Value, x => new MaintenanceScheduleId(x));
 
         builder.Property(x => x.TaskName)
             .HasMaxLength(255)

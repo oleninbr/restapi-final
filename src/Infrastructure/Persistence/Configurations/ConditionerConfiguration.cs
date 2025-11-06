@@ -1,4 +1,4 @@
-﻿using Domain.Conditioner;
+﻿using Domain.Conditioners;
 using Infrastructure.Persistence.Converters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -10,6 +10,7 @@ public class ConditionerConfiguration : IEntityTypeConfiguration<Conditioner>
     public void Configure(EntityTypeBuilder<Conditioner> builder)
     {
         builder.HasKey(x => x.Id);
+        builder.Property(x => x.Id).HasConversion(x => x.Value, x => new ConditionerId(x));
 
         builder.Property(x => x.Name)
             .HasMaxLength(255)

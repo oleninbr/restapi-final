@@ -1,30 +1,29 @@
 ﻿using WebAPI.Dtos;
+using WebAPI.Modules.Errors;
+using Application.MaintenanceSchedules.Commands;
 using Application.Common.Interfaces.Queries;
-using Application.Commands;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers;
 
-[Route("maintenance-schedules")]
 [ApiController]
+[Route("maintenance-schedules")]
 public class MaintenanceSchedulesController(
-    IMaintenanceScheduleQueries maintenanceScheduleQueries,
+    IMaintenanceScheduleQueries queries,
     ISender sender) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyList<MaintenanceScheduleDto>>> GetMaintenanceSchedules(CancellationToken cancellationToken)
+    public async Task<ActionResult<IReadOnlyList<MaintenanceScheduleDto>>> GetAll(CancellationToken cancellationToken)
     {
-        var schedules = await maintenanceScheduleQueries.GetAllAsync(cancellationToken);
-        return schedules.Select(MaintenanceScheduleDto.FromDomainModel).ToList();
+        var entities = await queries.GetAllAsync(cancellationToken);
+        return entities.Select(MaintenanceScheduleDto.FromDomainModel).ToList();
     }
 
     [HttpPost]
-    public async Task<ActionResult<MaintenanceScheduleDto>> CreateMaintenanceSchedule(
-        [FromBody] CreateMaintenanceScheduleDto request,
-        CancellationToken cancellationToken)
+    public async Task<ActionResult<MaintenanceScheduleDto>> Create([FromBody] CreateMaintenanceScheduleDto request, CancellationToken cancellationToken)
     {
-        var command = new CreateMaintenanceScheduleCommand
+        var input = new CreateMaintenanceScheduleCommand
         {
             TaskName = request.TaskName,
             Description = request.Description,
@@ -34,8 +33,39 @@ public class MaintenanceSchedulesController(
             FrequencyId = request.FrequencyId
         };
 
-        var newSchedule = await sender.Send(command, cancellationToken);
+        var result = await sender.Send(input, cancellationToken);
+        return result.Match<ActionResult<MaintenanceScheduleDto>>(
+            s => MaintenanceScheduleDto.FromDomainModel(s),
+            e => e.ToObjectResult());
+    }
 
-        return MaintenanceScheduleDto.FromDomainModel(newSchedule);
+    [HttpPut]
+    public async Task<ActionResult<MaintenanceScheduleDto>> Update([FromBody] UpdateMaintenanceScheduleDto request, CancellationToken cancellationToken)
+    {
+        var input = new UpdateMaintenanceScheduleCommand
+        {
+            MaintenanceScheduleId = request.Id,
+            TaskName = request.TaskName,
+            Description = request.Description,
+            NextDueDate = request.NextDueDate,
+            IsActive = request.IsActive,
+            ConditionerId = request.ConditionerId,
+            FrequencyId = request.FrequencyId
+        };
+
+        var result = await sender.Send(input, cancellationToken);
+        return result.Match<ActionResult<MaintenanceScheduleDto>>(
+            s => MaintenanceScheduleDto.FromDomainModel(s),
+            e => e.ToObjectResult());
+    }
+
+    [HttpDelete("{id:guid}")]
+    public async Task<ActionResult<MaintenanceScheduleDto>> Delete([FromRoute] Guid id, CancellationToken cancellationToken)
+    {
+        var input = new DeleteMaintenanceScheduleCommand { MaintenanceScheduleId = id };
+        var result = await sender.Send(input, cancellationToken);
+        return result.Match<ActionResult<MaintenanceScheduleDto>>(
+            s => MaintenanceScheduleDto.FromDomainModel(s),
+            e => e.ToObjectResult());
     }
 }

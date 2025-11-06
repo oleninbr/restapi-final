@@ -11,7 +11,7 @@ public class ApplicationDbContextInitialiser(
     {
         try
         {
-            //await dbContext.Database.MigrateAsync();
+            await dbContext.Database.MigrateAsync();
         }
         catch (Exception exception)
         {

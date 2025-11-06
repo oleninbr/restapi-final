@@ -1,13 +1,13 @@
-﻿namespace Domain.ConditionerType;
+﻿namespace Domain.ConditionerTypes;
 
 public class ConditionerType
 {
-    public Guid Id { get; }
+    public ConditionerTypeId Id { get; }
     public string Name { get; private set; }
     public DateTime CreatedAt { get; }
     public DateTime? UpdatedAt { get; private set; }
 
-    private ConditionerType(Guid id, string name, DateTime createdAt, DateTime? updatedAt)
+    private ConditionerType(ConditionerTypeId id, string name, DateTime createdAt, DateTime? updatedAt)
     {
         Id = id;
         Name = name;
@@ -15,10 +15,8 @@ public class ConditionerType
         UpdatedAt = updatedAt;
     }
 
-    public static ConditionerType New(Guid id, string name)
-    {
-        return new ConditionerType(id, name, DateTime.UtcNow, null);
-    }
+    public static ConditionerType New(ConditionerTypeId id, string name)
+        => new(id, name, DateTime.UtcNow, null);
 
     public void UpdateName(string name)
     {

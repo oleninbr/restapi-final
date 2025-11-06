@@ -10,6 +10,7 @@ public class WorkOrderPriorityConfiguration : IEntityTypeConfiguration<WorkOrder
     public void Configure(EntityTypeBuilder<WorkOrderPriority> builder)
     {
         builder.HasKey(x => x.Id);
+        builder.Property(x => x.Id).HasConversion(x => x.Value, x => new WorkOrderPriorityId(x));
 
         builder.Property(x => x.Name)
             .HasMaxLength(255)

@@ -1,9 +1,9 @@
 ﻿using Application.Common.Interfaces.Queries;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Settings;
-using Domain.Entities;
+using Domain.MaintenanceFrequencies;
+using LanguageExt;
 using Microsoft.EntityFrameworkCore;
-
 
 namespace Infrastructure.Persistence.Repositories;
 
@@ -16,6 +16,14 @@ public class MaintenanceFrequencyRepository : IMaintenanceFrequencyRepository, I
         var connectionString = settings.ConnectionStrings.DefaultConnection;
         _context = context;
     }
+    public async Task<Option<MaintenanceFrequency>> GetByNameAsync(string name, CancellationToken cancellationToken)
+    {
+        var entity = await _context.MaintenanceFrequencies
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Name == name, cancellationToken);
+
+        return entity ?? Option<MaintenanceFrequency>.None;
+    }
 
     public async Task<MaintenanceFrequency> AddAsync(MaintenanceFrequency entity, CancellationToken cancellationToken)
     {
@@ -24,29 +32,33 @@ public class MaintenanceFrequencyRepository : IMaintenanceFrequencyRepository, I
         return entity;
     }
 
-    public async Task<IReadOnlyList<MaintenanceFrequency>> GetAllAsync(CancellationToken cancellationToken)
-    {
-        return await _context.MaintenanceFrequencies.ToListAsync(cancellationToken);
-    }
-
-    public async Task<MaintenanceFrequency> GetByIdAsync(Guid id, CancellationToken cancellationToken)
-    {
-        return await _context.MaintenanceFrequencies.FindAsync(new object[] { id }, cancellationToken);
-    }
-
-    public async Task UpdateAsync(MaintenanceFrequency entity, CancellationToken cancellationToken)
+    public async Task<MaintenanceFrequency> UpdateAsync(MaintenanceFrequency entity, CancellationToken cancellationToken)
     {
         _context.MaintenanceFrequencies.Update(entity);
         await _context.SaveChangesAsync(cancellationToken);
+        return entity;
     }
 
-    public async Task DeleteAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<MaintenanceFrequency> DeleteAsync(MaintenanceFrequency entity, CancellationToken cancellationToken)
     {
-        var entity = await _context.MaintenanceFrequencies.FindAsync(new object[] { id }, cancellationToken);
-        if (entity != null)
-        {
-            _context.MaintenanceFrequencies.Remove(entity);
-            await _context.SaveChangesAsync(cancellationToken);
-        }
+        _context.MaintenanceFrequencies.Remove(entity);
+        await _context.SaveChangesAsync(cancellationToken);
+        return entity;
+    }
+
+    public async Task<Option<MaintenanceFrequency>> GetByIdAsync(MaintenanceFrequencyId id, CancellationToken cancellationToken)
+    {
+        var entity = await _context.MaintenanceFrequencies
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Id.Equals(id), cancellationToken);
+
+        return entity ?? Option<MaintenanceFrequency>.None;
+    }
+
+    public async Task<IReadOnlyList<MaintenanceFrequency>> GetAllAsync(CancellationToken cancellationToken)
+    {
+        return await _context.MaintenanceFrequencies
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
     }
 }

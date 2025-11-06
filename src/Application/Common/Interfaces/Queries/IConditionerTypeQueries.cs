@@ -1,10 +1,10 @@
-﻿using Domain.ConditionerType;
+﻿using Domain.ConditionerTypes;
+using LanguageExt;
 
-namespace Application.Common.Interfaces.Queries
+namespace Application.Common.Interfaces.Queries;
+
+public interface IConditionerTypeQueries
 {
-    public interface IConditionerTypeQueries
-    {
-        Task<IReadOnlyList<ConditionerType>> GetAllAsync(CancellationToken cancellationToken);
-        Task<ConditionerType> GetByIdAsync(Guid id, CancellationToken cancellationToken);
-    }
+    Task<IReadOnlyList<ConditionerType>> GetAllAsync(CancellationToken cancellationToken);
+    Task<Option<ConditionerType>> GetByIdAsync(ConditionerTypeId id, CancellationToken cancellationToken);
 }

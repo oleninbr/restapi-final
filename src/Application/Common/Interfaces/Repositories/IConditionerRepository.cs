@@ -1,13 +1,15 @@
-﻿using Domain.Conditioner;
+﻿using Domain.Conditioners;
+using LanguageExt;
 
-namespace Application.Common.Interfaces.Repositories
+namespace Application.Common.Interfaces.Repositories;
+
+public interface IConditionerRepository
 {
-    public interface IConditionerRepository
-    {
-        Task<Conditioner> AddAsync(Conditioner entity, CancellationToken cancellationToken);
-        Task<Conditioner> GetByIdAsync(Guid id, CancellationToken cancellationToken);
-        Task<IReadOnlyList<Conditioner>> GetAllAsync(CancellationToken cancellationToken);
-        Task UpdateAsync(Conditioner entity, CancellationToken cancellationToken);
-        Task DeleteAsync(Guid id, CancellationToken cancellationToken);
-    }
+    Task<Conditioner> AddAsync(Conditioner entity, CancellationToken cancellationToken);
+    Task<Conditioner> UpdateAsync(Conditioner entity, CancellationToken cancellationToken);
+    Task<Conditioner> DeleteAsync(Conditioner entity, CancellationToken cancellationToken);
+
+    Task<Option<Conditioner>> GetByIdAsync(ConditionerId id, CancellationToken cancellationToken);
+    Task<Option<Conditioner>> GetBySerialNumberAsync(string serialNumber, CancellationToken cancellationToken);
+    Task<IReadOnlyList<Conditioner>> GetAllAsync(CancellationToken cancellationToken);
 }

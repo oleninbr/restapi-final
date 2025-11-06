@@ -1,6 +1,8 @@
-﻿using Domain.MaintenanceSchedules;
+﻿using Domain.ConditionerStatuses;
+using Domain.ConditionerTypes;
+using Domain.Manufacturers;
 
-namespace Domain.Conditioner;
+namespace Domain.Conditioners;
 
 public class Conditioner
 {
@@ -10,19 +12,15 @@ public class Conditioner
     public string SerialNumber { get; private set; }
     public string Location { get; private set; }
     public DateTime InstallationDate { get; private set; }
-    public ConditionerStatusId StatusId { get; private set; }
-    public ConditionerStatus? Status { get; private set; }
-    public ConditionerTypeId TypeId { get; private set; }
-    public ConditionerType? Type { get; private set; }
-    public ManufacturerId ManufacturerId { get; private set; }
-    public Manufacturer? Manufacturer { get; private set; }
+    public Guid StatusId { get; private set; }
+    public Guid TypeId { get; private set; }
+    public Guid ManufacturerId { get; private set; }
     public DateTime CreatedAt { get; }
     public DateTime? UpdatedAt { get; private set; }
-
-
-    // Навігаційні властивості
-    public ICollection<MaintenanceSchedule>? MaintenanceSchedules { get; private set; } = [];
-    public ICollection<WorkOrder>? WorkOrders { get; private set; } = [];
+    // 🔹 Навігаційні властивості
+    public ConditionerStatus? Status { get; private set; }
+    public ConditionerType? Type { get; private set; }
+    public Manufacturer? Manufacturer { get; private set; }
 
     private Conditioner(
         ConditionerId id,
@@ -31,9 +29,9 @@ public class Conditioner
         string serialNumber,
         string location,
         DateTime installationDate,
-        ConditionerStatusId statusId,
-        ConditionerTypeId typeId,
-        ManufacturerId manufacturerId,
+        Guid statusId,
+        Guid typeId,
+        Guid manufacturerId,
         DateTime createdAt,
         DateTime? updatedAt)
     {
@@ -57,10 +55,15 @@ public class Conditioner
         string serialNumber,
         string location,
         DateTime installationDate,
-        ConditionerStatusId statusId,
-        ConditionerTypeId typeId,
-        ManufacturerId manufacturerId)
-        => new(id, name, model, serialNumber, location, installationDate, statusId, typeId, manufacturerId, DateTime.UtcNow, null);
+        Guid statusId,
+        Guid typeId,
+        Guid manufacturerId)
+    {
+        return new Conditioner(
+            id, name, model, serialNumber, location,
+            installationDate, statusId, typeId, manufacturerId,
+            DateTime.UtcNow, null);
+    }
 
     public void UpdateDetails(
         string name,
@@ -68,9 +71,9 @@ public class Conditioner
         string serialNumber,
         string location,
         DateTime installationDate,
-        ConditionerStatusId statusId,
-        ConditionerTypeId typeId,
-        ManufacturerId manufacturerId)
+        Guid statusId,
+        Guid typeId,
+        Guid manufacturerId)
     {
         Name = name;
         Model = model;

@@ -1,10 +1,10 @@
-﻿using Domain.Manufacturer;
+﻿using Domain.Manufacturers;
+using LanguageExt;
 
-namespace Application.Common.Interfaces.Queries
+namespace Application.Common.Interfaces.Queries;
+
+public interface IManufacturerQueries
 {
-    public interface IManufacturerQueries
-    {
-        Task<IReadOnlyList<Manufacturer>> GetAllAsync(CancellationToken cancellationToken);
-        Task<Manufacturer> GetByIdAsync(Guid id, CancellationToken cancellationToken);
-    }
+    Task<IReadOnlyList<Manufacturer>> GetAllAsync(CancellationToken cancellationToken);
+    Task<Option<Manufacturer>> GetByIdAsync(ManufacturerId id, CancellationToken cancellationToken);
 }

@@ -1,7 +1,8 @@
 ﻿using Application.Common.Interfaces.Queries;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Settings;
-using Domain.WorkOrder;
+using Domain.WorkOrders;
+using LanguageExt;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence.Repositories;
@@ -16,6 +17,16 @@ public class WorkOrderRepository : IWorkOrderRepository, IWorkOrderQueries
         _context = context;
     }
 
+    public async Task<Option<WorkOrder>> GetByNumberAsync(string workOrderNumber, CancellationToken cancellationToken)
+    {
+        var entity = await _context.WorkOrders
+            .Include(x => x.Conditioner)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.WorkOrderNumber == workOrderNumber, cancellationToken);
+
+        return entity ?? Option<WorkOrder>.None;
+    }
+
     public async Task<WorkOrder> AddAsync(WorkOrder entity, CancellationToken cancellationToken)
     {
         await _context.WorkOrders.AddAsync(entity, cancellationToken);
@@ -23,29 +34,35 @@ public class WorkOrderRepository : IWorkOrderRepository, IWorkOrderQueries
         return entity;
     }
 
-    public async Task<IReadOnlyList<WorkOrder>> GetAllAsync(CancellationToken cancellationToken)
-    {
-        return await _context.WorkOrders.ToListAsync(cancellationToken);
-    }
-
-    public async Task<WorkOrder> GetByIdAsync(Guid id, CancellationToken cancellationToken)
-    {
-        return await _context.WorkOrders.FindAsync(new object[] { id }, cancellationToken);
-    }
-
-    public async Task UpdateAsync(WorkOrder entity, CancellationToken cancellationToken)
+    public async Task<WorkOrder> UpdateAsync(WorkOrder entity, CancellationToken cancellationToken)
     {
         _context.WorkOrders.Update(entity);
         await _context.SaveChangesAsync(cancellationToken);
+        return entity;
     }
 
-    public async Task DeleteAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<WorkOrder> DeleteAsync(WorkOrder entity, CancellationToken cancellationToken)
     {
-        var entity = await _context.WorkOrders.FindAsync(new object[] { id }, cancellationToken);
-        if (entity != null)
-        {
-            _context.WorkOrders.Remove(entity);
-            await _context.SaveChangesAsync(cancellationToken);
-        }
+        _context.WorkOrders.Remove(entity);
+        await _context.SaveChangesAsync(cancellationToken);
+        return entity;
+    }
+
+    public async Task<Option<WorkOrder>> GetByIdAsync(WorkOrderId id, CancellationToken cancellationToken)
+    {
+        var entity = await _context.WorkOrders
+            .Include(x => x.Conditioner)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Id.Equals(id), cancellationToken);
+
+        return entity ?? Option<WorkOrder>.None;
+    }
+
+    public async Task<IReadOnlyList<WorkOrder>> GetAllAsync(CancellationToken cancellationToken)
+    {
+        return await _context.WorkOrders
+            .Include(x => x.Conditioner)
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
     }
 }

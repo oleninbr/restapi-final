@@ -1,40 +1,54 @@
 ﻿using WebAPI.Dtos;
+using WebAPI.Modules.Errors;
+using Application.ConditionerTypes.Commands;
 using Application.Common.Interfaces.Queries;
-using Application.Commands;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace WebAPI.Controllers;
 
-[Route("conditioner-types")]
 [ApiController]
+[Route("conditioner-types")]
 public class ConditionerTypesController(
-    IConditionerTypeQueries conditionerTypeQueries,
+    IConditionerTypeQueries queries,
     ISender sender) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyList<ConditionerTypeDto>>> GetConditionerTypes(CancellationToken cancellationToken)
+    public async Task<ActionResult<IReadOnlyList<ConditionerTypeDto>>> GetAll(CancellationToken cancellationToken)
     {
-        var types = await conditionerTypeQueries.GetAllAsync(cancellationToken);
-        return types.Select(ConditionerTypeDto.FromDomainModel).ToList();
+        var entities = await queries.GetAllAsync(cancellationToken);
+        return entities.Select(ConditionerTypeDto.FromDomainModel).ToList();
     }
 
     [HttpPost]
-    public async Task<ActionResult<ConditionerTypeDto>> CreateConditionerType(
-        [FromBody] CreateConditionerTypeDto request,
-        CancellationToken cancellationToken)
+    public async Task<ActionResult<ConditionerTypeDto>> Create([FromBody] CreateConditionerTypeDto request, CancellationToken cancellationToken)
     {
-        var command = new CreateConditionerTypeCommand
-        {
-            Name = request.Name
-        };
+        var input = new CreateConditionerTypeCommand { Name = request.Name };
+        var result = await sender.Send(input, cancellationToken);
+        return result.Match<ActionResult<ConditionerTypeDto>>(
+            s => ConditionerTypeDto.FromDomainModel(s),
+            e => e.ToObjectResult());
+    }
 
-        var newType = await sender.Send(command, cancellationToken);
+    [HttpPut]
+    public async Task<ActionResult<ConditionerTypeDto>> Update([FromBody] UpdateConditionerTypeDto request, CancellationToken cancellationToken)
+    {
+        // Fix CS0117 and CS9035 by using the correct property name 'ConditionerTypeId' instead of 'Id'  
+        var input = new UpdateConditionerTypeCommand { ConditionerTypeId = request.Id, Name = request.Name };
+        var result = await sender.Send(input, cancellationToken);
+        return result.Match<ActionResult<ConditionerTypeDto>>(
+            s => ConditionerTypeDto.FromDomainModel(s),
+            e => e.ToObjectResult());
+    }
 
-        return ConditionerTypeDto.FromDomainModel(newType);
+    [HttpDelete("{id:guid}")]
+    public async Task<ActionResult<ConditionerTypeDto>> Delete([FromRoute] Guid id, CancellationToken cancellationToken)
+    {
+        // Fix CS0117 and CS9035 by using the correct property name 'ConditionerTypeId' instead of 'Id'  
+        var input = new DeleteConditionerTypeCommand { ConditionerTypeId = id };
+        var result = await sender.Send(input, cancellationToken);
+        return result.Match<ActionResult<ConditionerTypeDto>>(
+            s => ConditionerTypeDto.FromDomainModel(s),
+            e => e.ToObjectResult());
     }
 }

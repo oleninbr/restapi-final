@@ -1,4 +1,4 @@
-﻿using Domain.WorkOrder;
+﻿using Domain.WorkOrders;
 using Infrastructure.Persistence.Converters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -10,6 +10,7 @@ public class WorkOrderConfiguration : IEntityTypeConfiguration<WorkOrder>
     public void Configure(EntityTypeBuilder<WorkOrder> builder)
     {
         builder.HasKey(x => x.Id);
+        builder.Property(x => x.Id).HasConversion(x => x.Value, x => new WorkOrderId(x));
 
         builder.Property(x => x.WorkOrderNumber)
             .HasMaxLength(255)
