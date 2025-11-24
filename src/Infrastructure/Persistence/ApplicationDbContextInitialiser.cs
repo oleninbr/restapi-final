@@ -11,7 +11,17 @@ public class ApplicationDbContextInitialiser(
     {
         try
         {
-            await dbContext.Database.MigrateAsync();
+            // Check for pending migrations
+            var pendingMigrations = await dbContext.Database.GetPendingMigrationsAsync();
+            if (pendingMigrations.Any())
+            {
+                logger.LogInformation("Applying pending migrations...");
+                await dbContext.Database.MigrateAsync();
+            }
+            else
+            {
+                logger.LogInformation("No pending migrations found. Database is up-to-date.");
+            }
         }
         catch (Exception exception)
         {
@@ -19,5 +29,6 @@ public class ApplicationDbContextInitialiser(
             throw;
         }
     }
+
 }
 

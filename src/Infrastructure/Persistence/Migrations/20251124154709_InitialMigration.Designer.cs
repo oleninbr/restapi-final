@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251106123746_SyncModelWithCode")]
-    partial class SyncModelWithCode
+    [Migration("20251124154709_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -119,6 +119,21 @@ namespace Infrastructure.Persistence.Migrations
                     b.HasIndex("TypeId");
 
                     b.ToTable("Conditioners");
+                });
+
+            modelBuilder.Entity("Domain.Conditioners.ConditionerMaintenanceSchedule", b =>
+                {
+                    b.Property<Guid>("ConditionerId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("MaintenanceScheduleId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("ConditionerId", "MaintenanceScheduleId");
+
+                    b.HasIndex("MaintenanceScheduleId");
+
+                    b.ToTable("ConditionerMaintenanceSchedules");
                 });
 
             modelBuilder.Entity("Domain.MaintenanceFrequencies.MaintenanceFrequency", b =>
@@ -334,6 +349,27 @@ namespace Infrastructure.Persistence.Migrations
                     b.Navigation("Type");
                 });
 
+            modelBuilder.Entity("Domain.Conditioners.ConditionerMaintenanceSchedule", b =>
+                {
+                    b.HasOne("Domain.Conditioners.Conditioner", "Conditioner")
+                        .WithMany("MaintenanceSchedules")
+                        .HasForeignKey("ConditionerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_conditioner_maintenance_schedule_conditioners_id");
+
+                    b.HasOne("Domain.MaintenanceSchedules.MaintenanceSchedule", "MaintenanceSchedule")
+                        .WithMany("Conditioners")
+                        .HasForeignKey("MaintenanceScheduleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_conditioner_maintenance_schedule_schedules_id");
+
+                    b.Navigation("Conditioner");
+
+                    b.Navigation("MaintenanceSchedule");
+                });
+
             modelBuilder.Entity("Domain.MaintenanceSchedules.MaintenanceSchedule", b =>
                 {
                     b.HasOne("Domain.Conditioners.Conditioner", "Conditioner")
@@ -378,6 +414,16 @@ namespace Infrastructure.Persistence.Migrations
                     b.Navigation("Priority");
 
                     b.Navigation("Status");
+                });
+
+            modelBuilder.Entity("Domain.Conditioners.Conditioner", b =>
+                {
+                    b.Navigation("MaintenanceSchedules");
+                });
+
+            modelBuilder.Entity("Domain.MaintenanceSchedules.MaintenanceSchedule", b =>
+                {
+                    b.Navigation("Conditioners");
                 });
 #pragma warning restore 612, 618
         }

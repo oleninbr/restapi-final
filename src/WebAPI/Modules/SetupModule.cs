@@ -1,8 +1,8 @@
-﻿using Api.Filters;
+﻿using WebAPI.Filters;
 using Application.Common.Settings;
 using FluentValidation;
 
-namespace Api.Modules;
+namespace WebAPI.Modules;
 
 public static class SetupModule
 {

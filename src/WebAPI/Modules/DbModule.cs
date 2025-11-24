@@ -1,6 +1,6 @@
 ﻿using Infrastructure.Persistence;
 
-namespace Api.Modules;
+namespace WebAPI.Modules;
 
 public static class DbModule
 {
