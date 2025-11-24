@@ -26,14 +26,11 @@ public class IntegrationTestWebFactory : WebApplicationFactory<Program>, IAsyncL
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.UseEnvironment("Test");
-
         builder.ConfigureTestServices(services =>
         {
             RegisterDatabase(services);
             RegisterTestServices(services);
-        })
-            .ConfigureAppConfiguration((_, config) =>
+        }).ConfigureAppConfiguration((_, config) =>
         {
             config
                 .AddJsonFile("appsettings.Test.json")

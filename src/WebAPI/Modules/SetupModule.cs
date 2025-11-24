@@ -1,6 +1,8 @@
 ﻿using WebAPI.Filters;
 using Application.Common.Settings;
 using FluentValidation;
+using WebAPI.Services.Abstract;
+using WebAPI.Services.Implementation;
 
 namespace WebAPI.Modules;
 
@@ -15,6 +17,8 @@ public static class SetupModule
         services.AddCors();
         services.AddRequestValidators();
         services.AddApplicationSettings(configuration);
+        services.AddControllerServices();
+
     }
 
     private static void AddCors(this IServiceCollection services)
@@ -40,4 +44,11 @@ public static class SetupModule
             services.AddSingleton(settings);
         }
     }
+
+    private static void AddControllerServices(this IServiceCollection services)
+    {
+        services.AddScoped<IСonditionerTypesControlerService, СonditionerTypesControlerService>();
+      
+    }
+
 }
