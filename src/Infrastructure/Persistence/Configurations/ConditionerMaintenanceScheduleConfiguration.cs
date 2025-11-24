@@ -14,10 +14,14 @@ public class ConditionerMaintenanceScheduleConfiguration : IEntityTypeConfigurat
 
         // Конверсія Value Object → Guid і назад
         builder.Property(x => x.ConditionerId)
-            .HasConversion(id => id.Value, value => new ConditionerId(value));
+            .HasConversion(id => id.Value, value => new ConditionerId(value))
+            .HasColumnType("uuid")
+            .IsRequired();
 
         builder.Property(x => x.MaintenanceScheduleId)
-            .HasConversion(id => id.Value, value => new MaintenanceScheduleId(value));
+            .HasConversion(id => id.Value, value => new MaintenanceScheduleId(value))
+            .HasColumnType("uuid")
+            .IsRequired();
 
         // Відношення Conditioner ↔ ConditionerMaintenanceSchedule
         builder.HasOne(x => x.Conditioner)

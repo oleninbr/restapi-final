@@ -56,13 +56,19 @@ public class IntegrationTestWebFactory : WebApplicationFactory<Program>, IAsyncL
             .UseNpgsql(
                 dataSource,
                 builder => builder.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName))
-            .UseSnakeCaseNamingConvention()
+           // .UseSnakeCaseNamingConvention()
             .ConfigureWarnings(w => w.Ignore(CoreEventId.ManyServiceProvidersCreatedWarning)));
     }
 
-    public Task InitializeAsync()
+    public async Task InitializeAsync()
     {
-        return _dbContainer.StartAsync();
+        // 1. Стартуємо контейнер
+        await _dbContainer.StartAsync();
+
+        // 2. Створюємо scope і викликаємо міграції для тестової БД
+        using var scope = Services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        await context.Database.MigrateAsync();
     }
 
     public new Task DisposeAsync()
