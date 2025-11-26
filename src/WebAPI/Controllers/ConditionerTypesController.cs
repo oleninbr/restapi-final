@@ -19,8 +19,8 @@ public class ConditionerTypesController(
     [HttpGet]
     public async Task<ActionResult<IReadOnlyList<ConditionerTypeDto>>> GetCountries(CancellationToken cancellationToken)
     {
-        var countries = await conditionerTypesQueries.GetAllAsync(cancellationToken);
-        return countries.Select(ConditionerTypeDto.FromDomainModel).ToList();
+        var conditionerTypes = await conditionerTypesQueries.GetAllAsync(cancellationToken);
+        return conditionerTypes.Select(ConditionerTypeDto.FromDomainModel).ToList();
     }
 
     [HttpGet("{id:guid}")]
@@ -48,7 +48,7 @@ public class ConditionerTypesController(
     [HttpPut]
     public async Task<ActionResult<ConditionerTypeDto>> Update([FromBody] UpdateConditionerTypeDto request, CancellationToken cancellationToken)
     {
-        // Fix CS0117 and CS9035 by using the correct property name 'ConditionerTypeId' instead of 'Id'  
+          
         var input = new UpdateConditionerTypeCommand { ConditionerTypeId = request.Id, Name = request.Name };
         var result = await sender.Send(input, cancellationToken);
         return result.Match<ActionResult<ConditionerTypeDto>>(
@@ -59,7 +59,7 @@ public class ConditionerTypesController(
     [HttpDelete("{id:guid}")]
     public async Task<ActionResult<ConditionerTypeDto>> Delete([FromRoute] Guid id, CancellationToken cancellationToken)
     {
-        // Fix CS0117 and CS9035 by using the correct property name 'ConditionerTypeId' instead of 'Id'  
+         
         var input = new DeleteConditionerTypeCommand { ConditionerTypeId = id };
         var result = await sender.Send(input, cancellationToken);
         return result.Match<ActionResult<ConditionerTypeDto>>(

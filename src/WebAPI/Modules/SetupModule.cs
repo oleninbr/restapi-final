@@ -48,7 +48,8 @@ public static class SetupModule
     private static void AddControllerServices(this IServiceCollection services)
     {
         services.AddScoped<IСonditionerTypesControlerService, СonditionerTypesControlerService>();
-      
+        services.AddScoped<IСonditionerStatusesControllerService, СonditionerStatusesControllerService>();
     }
+
 
 }

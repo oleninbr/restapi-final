@@ -4,20 +4,37 @@ using Application.ConditionerStatuses.Commands;
 using Application.Common.Interfaces.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using WebAPI.Services.Abstract;
 
 namespace WebAPI.Controllers;
 
 [ApiController]
 [Route("conditioner-statuses")]
 public class ConditionerStatusesController(
-    IConditionerStatusQueries queries,
+    IConditionerStatusQueries conditionerStatusesQueries,
+    IСonditionerStatusesControllerService controllerService ,
     ISender sender) : ControllerBase
 {
+
+    //get all method chenged to get conditioner statuses
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyList<ConditionerStatusDto>>> GetAll(CancellationToken cancellationToken)
+    public async Task<ActionResult<IReadOnlyList<ConditionerStatusDto>>> GetCountries(CancellationToken cancellationToken)
     {
-        var entities = await queries.GetAllAsync(cancellationToken);
-        return entities.Select(ConditionerStatusDto.FromDomainModel).ToList();
+        var conditionerStatuses = await conditionerStatusesQueries.GetAllAsync(cancellationToken);
+        return conditionerStatuses.Select(ConditionerStatusDto.FromDomainModel).ToList();
+    }
+
+    //added Get by id method
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<ConditionerStatusDto>> Get(
+       [FromRoute] Guid id,
+       CancellationToken cancellationToken)
+    {
+        var entity = await controllerService.Get(id, cancellationToken);
+
+        return entity.Match<ActionResult<ConditionerStatusDto>>(
+            e => e,
+            () => NotFound());
     }
 
     [HttpPost]

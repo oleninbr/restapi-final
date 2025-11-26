@@ -11,7 +11,12 @@ public class ConditionerStatusConfiguration : IEntityTypeConfiguration<Condition
     public void Configure(EntityTypeBuilder<ConditionerStatus> builder)
     {
         builder.HasKey(x => x.Id);
-        builder.Property(x => x.Id).HasConversion(x => x.Value, x => new ConditionerStatusId(x));
+        builder.Property(x => x.Id)
+            .HasConversion(
+                x => x.Value,
+                x => new ConditionerStatusId(x))
+            .ValueGeneratedNever();
+
 
         builder.Property(x => x.Name)
             .HasMaxLength(255)
