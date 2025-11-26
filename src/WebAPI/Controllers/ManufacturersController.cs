@@ -4,6 +4,7 @@ using Application.Manufacturers.Commands;
 using Application.Common.Interfaces.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using WebAPI.Services.Abstract;
 
 namespace WebAPI.Controllers;
 
@@ -11,6 +12,7 @@ namespace WebAPI.Controllers;
 [Route("manufacturers")]
 public class ManufacturersController(
     IManufacturerQueries queries,
+    IManufacturersControllerService controllerService,
     ISender sender) : ControllerBase
 {
     [HttpGet]
@@ -18,6 +20,18 @@ public class ManufacturersController(
     {
         var entities = await queries.GetAllAsync(cancellationToken);
         return entities.Select(ManufacturerDto.FromDomainModel).ToList();
+    }
+
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<ManufacturerDto>> Get(
+        [FromRoute] Guid id,
+        CancellationToken cancellationToken)
+    {
+        var entity = await controllerService.Get(id, cancellationToken);
+
+        return entity.Match<ActionResult<ManufacturerDto>>(
+            e => e,
+            () => NotFound());
     }
 
     [HttpPost]
