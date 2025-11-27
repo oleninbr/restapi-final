@@ -55,6 +55,7 @@ public static class SetupModule
         services.AddScoped<IMaintenanceSchedulesControllerService, MaintenanceSchedulesControllerService>();
         services.AddScoped<IMaintenanceFrequenciesControllerService, MaintenanceFrequenciesControllerService>();
         services.AddScoped<IWorkOrderControllerService, WorkOrderControllerService>();
+        services.AddScoped<IConditionerControllerService, ConditionerControllerService>();
     }
 
 

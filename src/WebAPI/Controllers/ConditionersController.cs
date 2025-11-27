@@ -4,6 +4,7 @@ using Application.Common.Interfaces.Queries;
 using Application.Conditioners.Commands;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using WebAPI.Services.Abstract;
 
 namespace WebAPI.Controllers;
 
@@ -11,6 +12,7 @@ namespace WebAPI.Controllers;
 [Route("conditioners")]
 public class ConditionersController(
     IConditionerQueries conditionerQueries,
+    IConditionerControllerService controllerService,
     ISender sender) : ControllerBase
 {
     [HttpGet]
@@ -19,6 +21,19 @@ public class ConditionersController(
         var conditioners = await conditionerQueries.GetAllAsync(cancellationToken);
         return conditioners.Select(ConditionerDto.FromDomainModel).ToList();
     }
+
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<ConditionerDto>> Get(
+      [FromRoute] Guid id,
+      CancellationToken cancellationToken)
+    {
+        var entity = await controllerService.Get(id, cancellationToken);
+
+        return entity.Match<ActionResult<ConditionerDto>>(
+            e => e,
+            () => NotFound());
+    }
+
 
     [HttpPost]
     public async Task<ActionResult<ConditionerDto>> Create([FromBody] CreateConditionerDto request, CancellationToken cancellationToken)
