@@ -51,6 +51,8 @@ public static class SetupModule
         services.AddScoped<IСonditionerStatusesControllerService, СonditionerStatusesControllerService>();
         services.AddScoped<IManufacturersControllerService, ManufacturersControllerService>();
         services.AddScoped<IWorkOrderStatusesControllerService, WorkOrderStatusesControllerService>();
+        services.AddScoped<IWorkOrderPrioritiesControllerService, WorkOrderPrioritiesControllerService>();
+
     }
 
 

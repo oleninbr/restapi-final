@@ -4,6 +4,7 @@ using Application.WorkOrderPriorities.Commands;
 using Application.Common.Interfaces.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using WebAPI.Services.Abstract;
 
 namespace WebAPI.Controllers;
 
@@ -11,6 +12,7 @@ namespace WebAPI.Controllers;
 [Route("work-order-priorities")]
 public class WorkOrderPrioritiesController(
     IWorkOrderPriorityQueries queries,
+    IWorkOrderPrioritiesControllerService controllerService,
     ISender sender) : ControllerBase
 {
     [HttpGet]
@@ -18,6 +20,21 @@ public class WorkOrderPrioritiesController(
     {
         var entities = await queries.GetAllAsync(cancellationToken);
         return entities.Select(WorkOrderPriorityDto.FromDomainModel).ToList();
+    }
+
+
+    
+    //added Get by id method
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<WorkOrderPriorityDto>> Get(
+       [FromRoute] Guid id,
+       CancellationToken cancellationToken)
+    {
+        var entity = await controllerService.Get(id, cancellationToken);
+
+        return entity.Match<ActionResult<WorkOrderPriorityDto>>(
+            e => e,
+            () => NotFound());
     }
 
     [HttpPost]
