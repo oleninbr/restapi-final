@@ -4,6 +4,7 @@ using Application.MaintenanceFrequencies.Commands;
 using Application.Common.Interfaces.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using WebAPI.Services.Abstract;
 
 namespace WebAPI.Controllers;
 
@@ -11,6 +12,7 @@ namespace WebAPI.Controllers;
 [Route("maintenance-frequencies")]
 public class MaintenanceFrequenciesController(
     IMaintenanceFrequencyQueries queries,
+    IMaintenanceFrequenciesControllerService controllerService,
     ISender sender) : ControllerBase
 {
     [HttpGet]
@@ -19,6 +21,19 @@ public class MaintenanceFrequenciesController(
         var entities = await queries.GetAllAsync(cancellationToken);
         return entities.Select(MaintenanceFrequencyDto.FromDomainModel).ToList();
     }
+
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<MaintenanceFrequencyDto>> Get(
+        [FromRoute] Guid id,
+        CancellationToken cancellationToken)
+    {
+        var entity = await controllerService.Get(id, cancellationToken);
+
+        return entity.Match<ActionResult<MaintenanceFrequencyDto>>(
+            e => e,
+            () => NotFound());
+    }
+
 
     [HttpPost]
     public async Task<ActionResult<MaintenanceFrequencyDto>> Create([FromBody] CreateMaintenanceFrequencyDto request, CancellationToken cancellationToken)
