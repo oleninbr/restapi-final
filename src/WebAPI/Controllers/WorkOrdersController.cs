@@ -4,6 +4,7 @@ using Application.WorkOrders.Commands;
 using Application.Common.Interfaces.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using WebAPI.Services.Abstract;
 
 namespace WebAPI.Controllers;
 
@@ -11,6 +12,7 @@ namespace WebAPI.Controllers;
 [Route("work-orders")]
 public class WorkOrdersController(
     IWorkOrderQueries queries,
+    IWorkOrderControllerService controllerService,
     ISender sender) : ControllerBase
 {
     [HttpGet]
@@ -18,6 +20,18 @@ public class WorkOrdersController(
     {
         var entities = await queries.GetAllAsync(cancellationToken);
         return entities.Select(WorkOrderDto.FromDomainModel).ToList();
+    }
+
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<WorkOrderDto>> Get(
+      [FromRoute] Guid id,
+      CancellationToken cancellationToken)
+    {
+        var entity = await controllerService.Get(id, cancellationToken);
+
+        return entity.Match<ActionResult<WorkOrderDto>>(
+            e => e,
+            () => NotFound());
     }
 
     [HttpPost]
